@@ -80,8 +80,10 @@ def run_test():
         # main classification algorithm
         rating = []
         for word in review_words:
-            pos_degree = 1
-            neg_degree = 1
+            pos_degree = 0
+            neg_degree = 0
+            entry_element = 0
+            pos_high = False
             
             if word in positive_associated_words:
                 pos_degree = positive_associated_words[word] + 1
@@ -90,12 +92,22 @@ def run_test():
             
             if pos_degree == neg_degree:
                 ratio = 0
+                rating.append(ratio)
+                continue
             elif pos_degree > neg_degree:
-                ratio = pos_degree / neg_degree
+                if neg_degree == 0:
+                    ratio = pos_degree # TODO what to do if only positive degree
+                else:
+                    ratio = pos_degree / (neg_degree + pos_degree)
+                pos_high = True
             elif pos_degree < neg_degree:
-                ratio = neg_degree / pos_degree * (-1)
+                if pos_degree == 0:
+                    ratio = neg_degree
+                else:
+                    ratio = neg_degree / (pos_degree + pos_degree) * (-1)
             
-            rating.append(ratio)
+            entry_element = ratio * (pos_degree if pos_high else neg_degree)
+            rating.append(entry_element)
         
         summation = sum(rating)
         if summation >= 0:
