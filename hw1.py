@@ -19,7 +19,9 @@ def gen_stop_words():
     stop_words_file_obj.close()
     return generated_stop_words
 print("started stop_words generation")
-stop_words = ["THE","A"]
+#stop_words = ["THE","A"]
+stop_words = gen_stop_words()
+
 
 
 # Creates the dictionaries of positively/negatively "associated" words
@@ -43,7 +45,7 @@ def create_plot():
         # removes html breaks and capitalizes all words
         line = re.sub("<br \/>","",line).upper()
         # list of words in the review
-        unfiltered_review_words = re.findall(r"[a-zA-Z]+",line)
+        unfiltered_review_words = re.findall(r"[a-zA-Z][a-zA-Z]+",line)
         # remove suppressed words
         review_words = [word for word in unfiltered_review_words if word not in stop_words]
         
@@ -65,7 +67,8 @@ def create_plot():
     
     print(f"finished create_plot() with {len(positive_associated_words)} positive words and {len(negative_associated_words)} negative words")
 
-# scans test file and gives sentiment to review based on training data
+
+# scans test file and assigns sentiment to review based on training data
 def run_test():
     print("running run_test()")
     
@@ -83,9 +86,7 @@ def run_test():
         # removes contraction punctuation ' and removes html breaks then capitalizes all words
         line = re.sub("\'|(<br \/>)","",line).upper()
         # list of words in the review
-        unfiltered_review_words = re.findall(r"[a-zA-Z]+",line)
-        # remove suppressed words
-        review_words = [word for word in unfiltered_review_words if word not in stop_words]
+        review_words = re.findall(r"[a-zA-Z][a-zA-Z]+",line)
         
         # main classification algorithm
         rating = []
@@ -96,27 +97,30 @@ def run_test():
             
             if word in positive_associated_words:
                 pos_degree = positive_associated_words[word]
-            else:
-                ratio = pos_degree
-                rating.append(ratio)
-                continue
             if word in negative_associated_words:
                 neg_degree = negative_associated_words[word]
-            else:
-                ratio = neg_degree * (-1)
-                rating.append(ratio)
-                continue
             
             if pos_degree == neg_degree:
                 ratio = 0
                 rating.append(ratio)
                 continue
             elif pos_degree > neg_degree:
-                ratio = pos_degree / neg_degree
+                if neg_degree == 0:
+                    ratio = pos_degree
+                else:
+                    ratio = pos_degree / neg_degree
             elif neg_degree > pos_degree :
-                ratio = neg_degree / pos_degree * (-1)
+                if pos_degree == 0:
+                    ratio = neg_degree * (-1)
+                else:
+                    ratio = neg_degree / pos_degree * (-1)
             
-            entry_element = ratio
+            # Setting a threshold for considering the word
+            threshold_ratio = 3
+            if ratio < threshold_ratio and ratio > threshold_ratio * (-1):
+                entry_element = 0
+            else:
+                entry_element = ratio
             rating.append(entry_element)
         
         summation = sum(rating)
@@ -132,9 +136,11 @@ def run_test():
     test_file.close()
     out_file.close()
 
+
+# main function calls
+
 # runs the training
 create_plot()
 # runs the test
 run_test()
-input("Press Enter to continue...")
 
