@@ -40,10 +40,8 @@ def create_plot():
         sentiment = line[0]
         # removes contraction punctuation ' and truncates by removing sentiment and tab
         line = re.sub("\'","",line[3:])
-        # removes html breaks
-        line = re.sub("<br \/>","",line)
-        # capitalizes all words
-        line = line.upper()
+        # removes html breaks and capitalizes all words
+        line = re.sub("<br \/>","",line).upper()
         # list of words in the review
         unfiltered_review_words = re.findall(r"[a-zA-Z]+",line)
         # remove suppressed words
@@ -82,12 +80,8 @@ def run_test():
         line = test_file.readline()
         if (line == ""):
             break
-        # removes contraction punctuation '
-        line = re.sub("\'","",line)
-        # removes html breaks
-        line = re.sub("<br \/>","",line)
-        # capitalizes all words
-        line = line.upper()
+        # removes contraction punctuation ' and removes html breaks then capitalizes all words
+        line = re.sub("\'|(<br \/>)","",line).upper()
         # list of words in the review
         unfiltered_review_words = re.findall(r"[a-zA-Z]+",line)
         # remove suppressed words
@@ -99,24 +93,30 @@ def run_test():
             pos_degree = 0
             neg_degree = 0
             entry_element = 0
-            pos_high = False
             
             if word in positive_associated_words:
                 pos_degree = positive_associated_words[word]
+            else:
+                ratio = pos_degree
+                rating.append(ratio)
+                continue
             if word in negative_associated_words:
                 neg_degree = negative_associated_words[word]
+            else:
+                ratio = neg_degree * (-1)
+                rating.append(ratio)
+                continue
             
             if pos_degree == neg_degree:
                 ratio = 0
                 rating.append(ratio)
                 continue
             elif pos_degree > neg_degree:
-                ratio = pos_degree / (pos_degree + neg_degree)
-                pos_high = True
-            elif pos_degree < neg_degree:
-                ratio = neg_degree / (pos_degree + neg_degree) * (-1)
+                ratio = pos_degree / neg_degree
+            elif neg_degree > pos_degree :
+                ratio = neg_degree / pos_degree * (-1)
             
-            entry_element = ratio * (pos_degree if pos_high else neg_degree)
+            entry_element = ratio
             rating.append(entry_element)
         
         summation = sum(rating)
