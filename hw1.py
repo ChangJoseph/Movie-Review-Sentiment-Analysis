@@ -95,34 +95,39 @@ def run_test():
             neg_degree = 0
             entry_element = 0
             
+            # get the word's positive and negative training data frequency list
             if word in positive_associated_words:
                 pos_degree = positive_associated_words[word]
             if word in negative_associated_words:
                 neg_degree = negative_associated_words[word]
             
-            if pos_degree == neg_degree:
+            # associate a ratio with the current word
+            if pos_degree == neg_degree: # if the word is perfectly ambiguous
                 ratio = 0
                 rating.append(ratio)
                 continue
-            elif pos_degree > neg_degree:
+            elif pos_degree > neg_degree: # if the word seems to have positive connotation
                 if neg_degree == 0:
                     ratio = pos_degree
                 else:
                     ratio = pos_degree / neg_degree
-            elif neg_degree > pos_degree :
+            elif neg_degree > pos_degree: # if the word seems to have negative connotation
                 if pos_degree == 0:
                     ratio = neg_degree * (-1)
                 else:
                     ratio = neg_degree / pos_degree * (-1)
             
             # Setting a threshold for considering the word
-            threshold_ratio = 3
+            threshold_ratio = 2 # there must be at least 2 times the considered connotation vs the opposite
             if ratio < threshold_ratio and ratio > threshold_ratio * (-1):
                 entry_element = 0
             else:
                 entry_element = ratio
             rating.append(entry_element)
+            
+            # End of iteration
         
+        # Sums up the ratings of each word from the review
         summation = sum(rating)
         if summation >= 0:
             output_string += "+1\n"
@@ -135,6 +140,8 @@ def run_test():
     # close test and output files
     test_file.close()
     out_file.close()
+    
+    print("finished run_test()")
 
 
 # main function calls
