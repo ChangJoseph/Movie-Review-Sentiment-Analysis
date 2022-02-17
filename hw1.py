@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+# https://seaborn.pydata.org/tutorial/axis_grids.html
 
 # The file names of the training and testing files
 training_file = "1643859451_1934268_train_new_20220201.txt"
@@ -28,6 +29,15 @@ print("started stop_words generation")
 #stop_words = ["THE","A"]
 stop_words = gen_stop_words()
 
+# data visualization fields (for panda and seaborn libraries)
+# column variables for the datatable (panda)
+review_index = []
+positive_count = []
+negative_count = []
+def add_record(x, y, z):
+    review_index.append(x)
+    positive_count.append(y)
+    negative_count.append(z)
 
 
 # Creates the dictionaries of positively/negatively "associated" words
@@ -74,6 +84,7 @@ def create_plot():
     print(f"finished create_plot() with {len(positive_associated_words)} positive words and {len(negative_associated_words)} negative words")
 
 
+
 # scans test file and assigns sentiment to review based on training data
 def run_test():
     print("running run_test()")
@@ -96,6 +107,7 @@ def run_test():
         
         # main classification algorithm
         rating = []
+        review_index = 0 # current iteration number (corresponds to review index)
         for word in review_words:
             pos_degree = 0
             neg_degree = 0
@@ -106,6 +118,9 @@ def run_test():
                 pos_degree = positive_associated_words[word]
             if word in negative_associated_words:
                 neg_degree = negative_associated_words[word]
+            
+            # quick data visualization (panda) record insertion
+            add_record(review_index, pos_degree, neg_degree)
             
             # associate a ratio with the current word
             if pos_degree == neg_degree: # if the word is perfectly ambiguous
@@ -131,6 +146,7 @@ def run_test():
                 entry_element = ratio
             rating.append(entry_element)
             
+            review_index += 1
             # End of iteration
         
         # Sums up the ratings of each word from the review
@@ -165,7 +181,10 @@ print("Starting data visualization")
 # open test and output files
 test_file = open(testing_file, "r", encoding="utf-8")
 # use panda library to create a long-form datatable
-visual_training_set = pd.DataFrame({"col1": arr1, "col2": arr2, "col3": arr3})
-visual_graph = sns.regplot(x="col1",y="col2",visual_training_set)
-plt.show()
+visual_testing_set = pd.DataFrame({"review_index": review_index, "positive_degree": positive_count, "negative_degree": negative_count})
+# plot the datatable
+#regression_graph = sns.regplot(x="negative_degree", y="positive_degree", data=visual_testing_set)
+multiple_graph = sns.FacetGrid(visual_testing_set, col="review_index", margin_titles=True)
+multiple_graph.map(sns.regplot, "negative_degree", "positive_degree")
+plt.show() # show matlab graph window
 
