@@ -1,6 +1,12 @@
 # using regex to simplify reviews to only necessary words
 import re
 
+# library to visualize the data
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 # The file names of the training and testing files
 training_file = "1643859451_1934268_train_new_20220201.txt"
 testing_file = "1643859451_3370469_test_new_20220201.txt"
@@ -150,4 +156,16 @@ def run_test():
 create_plot()
 # runs the test
 run_test()
+
+
+
+# -- Data Visualization Section --
+print("Starting data visualization")
+
+# open test and output files
+test_file = open(testing_file, "r", encoding="utf-8")
+# use panda library to create a long-form datatable
+visual_training_set = pd.DataFrame({"col1": arr1, "col2": arr2, "col3": arr3})
+visual_graph = sns.regplot(x="col1",y="col2",visual_training_set)
+plt.show()
 
