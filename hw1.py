@@ -139,7 +139,7 @@ def run_test():
                     ratio = neg_degree / pos_degree * (-1)
             
             # Setting a threshold for considering the word
-            threshold_ratio = 2 # there must be at least 2 times the considered connotation vs the opposite
+            threshold_ratio = 1.8 # there must be at least 2 times the considered connotation vs the opposite
             if ratio < threshold_ratio and ratio > threshold_ratio * (-1):
                 entry_element = 0
             else:
