@@ -119,9 +119,6 @@ def run_test():
             if word in negative_associated_words:
                 neg_degree = negative_associated_words[word]
             
-            # quick data visualization (panda) record insertion
-            add_record(review_index, pos_degree, neg_degree)
-            
             # associate a ratio with the current word
             if pos_degree == neg_degree: # if the word is perfectly ambiguous
                 ratio = 0
@@ -144,6 +141,9 @@ def run_test():
                 entry_element = 0
             else:
                 entry_element = ratio
+                # quick data visualization (panda) record insertion
+                add_record(review_index, pos_degree, neg_degree)
+            # add entry_element to review rating summation
             rating.append(entry_element)
             
             review_index += 1
