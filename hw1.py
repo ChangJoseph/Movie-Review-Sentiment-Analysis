@@ -2,11 +2,10 @@
 import re
 
 # library to visualize the data
-import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-# https://seaborn.pydata.org/tutorial/axis_grids.html
+# https://seaborn.pydata.org/
 
 # The file names of the training and testing files
 training_file = "1643859451_1934268_train_new_20220201.txt"
@@ -67,12 +66,12 @@ def create_plot():
         
         # iterates through each word and adds them to correlated dict
         for word in review_words:
-            if (sentiment == "+"):
+            if (sentiment == "+"): # increase positive frequency for the word
                 if word in positive_associated_words:
                     positive_associated_words[word] += 1
                 else:
                     positive_associated_words[word] = 1
-            elif (sentiment == "-"):
+            elif (sentiment == "-"): # increase negative frequency for the word
                 if word in negative_associated_words:
                     negative_associated_words[word] += 1
                 else:
@@ -109,6 +108,7 @@ def run_test():
         rating = []
         review_index = 0 # current iteration number (corresponds to review index)
         for word in review_words:
+            # initiate the words pos/neg degrees to 0
             pos_degree = 0
             neg_degree = 0
             entry_element = 0
@@ -118,6 +118,9 @@ def run_test():
                 pos_degree = positive_associated_words[word]
             if word in negative_associated_words:
                 neg_degree = negative_associated_words[word]
+            
+            # panda record insertion for no-threshold visualization
+            #add_record(review_index, pos_degree, neg_degree)
             
             # associate a ratio with the current word
             if pos_degree == neg_degree: # if the word is perfectly ambiguous
@@ -136,7 +139,7 @@ def run_test():
                     ratio = neg_degree / pos_degree * (-1)
             
             # Setting a threshold for considering the word
-            threshold_ratio = 1.8 # there must be at least 2 times the considered connotation vs the opposite
+            threshold_ratio = 1.6 # there must be at least 2 times the considered connotation vs the opposite
             if ratio < threshold_ratio and ratio > threshold_ratio * (-1):
                 entry_element = 0
             else:
@@ -176,15 +179,51 @@ run_test()
 
 
 # -- Data Visualization Section --
-print("Starting data visualization")
+print("\nStarting data visualization")
 
-# open test and output files
-test_file = open(testing_file, "r", encoding="utf-8")
+"""
 # use panda library to create a long-form datatable
 visual_testing_set = pd.DataFrame({"review_index": review_index, "positive_degree": positive_count, "negative_degree": negative_count})
 # plot the datatable
 #regression_graph = sns.regplot(x="negative_degree", y="positive_degree", data=visual_testing_set)
 multiple_graph = sns.FacetGrid(visual_testing_set, col="review_index", margin_titles=True)
 multiple_graph.map(sns.regplot, "negative_degree", "positive_degree")
+"""
+
+i = 0
+pos_ind1 = []
+neg_ind1 = []
+pos_ind2 = []
+neg_ind2 = []
+pos_ind3 = []
+neg_ind3 = []
+while review_index[i] < 3:
+    if review_index[i] == 0:
+        pos_ind1.append(positive_count[i])
+        neg_ind1.append(negative_count[i])
+    elif review_index[i] == 1:
+        pos_ind2.append(positive_count[i])
+        neg_ind2.append(negative_count[i])
+    elif review_index[i] == 2:
+        pos_ind3.append(positive_count[i])
+        neg_ind3.append(negative_count[i])
+    i += 1
+
+#print(f"counts of positive review words: {len(pos_ind1)} {len(pos_ind2)} {len(pos_ind3)}")
+set1 = pd.DataFrame({"positive_degree": pos_ind1, "negative_degree": neg_ind1})
+set2 = pd.DataFrame({"positive_degree": pos_ind2, "negative_degree": neg_ind2})
+set3 = pd.DataFrame({"positive_degree": pos_ind3, "negative_degree": neg_ind3})
+
+plt.axis("square")
+a = plt.figure(1)
+regression_graph1 = sns.regplot(x="negative_degree", y="positive_degree", data=set1)
+a.show()
+b = plt.figure(2)
+regression_graph2 = sns.regplot(x="negative_degree", y="positive_degree", data=set2)
+b.show()
+c = plt.figure(3)
+regression_graph3 = sns.regplot(x="negative_degree", y="positive_degree", data=set3)
+c.show()
+
 plt.show() # show matlab graph window
 
