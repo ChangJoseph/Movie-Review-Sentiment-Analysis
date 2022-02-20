@@ -94,6 +94,9 @@ def run_test():
     # string to write in output file
     output_string = ""
     
+    # current iteration number
+    review_index = 0
+    
     # testing portion
     while (1):
         line = test_file.readline()
@@ -106,7 +109,6 @@ def run_test():
         
         # main classification algorithm
         rating = []
-        review_index = 0 # current iteration number (corresponds to review index)
         for word in review_words:
             # initiate the words pos/neg degrees to 0
             pos_degree = 0
@@ -149,8 +151,8 @@ def run_test():
             # add entry_element to review rating summation
             rating.append(entry_element)
             
-            review_index += 1
             # End of iteration
+        review_index += 1
         
         # Sums up the ratings of each word from the review
         summation = sum(rating)
@@ -190,13 +192,13 @@ multiple_graph = sns.FacetGrid(visual_testing_set, col="review_index", margin_ti
 multiple_graph.map(sns.regplot, "negative_degree", "positive_degree")
 """
 
-i = 0
 pos_ind1 = []
 neg_ind1 = []
 pos_ind2 = []
 neg_ind2 = []
 pos_ind3 = []
 neg_ind3 = []
+i = 0
 while review_index[i] < 3:
     if review_index[i] == 0:
         pos_ind1.append(positive_count[i])
